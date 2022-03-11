@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">E-Commerce</string>
+    <string name="title_home">Home</string>
+    <string name="title_favourite">Favourite</string>
+    <string name="title_cart">Cart</string>
+    <string name="title_account">Account</string>
+    <string name="title_explore">Explore</string>
+</resources>
