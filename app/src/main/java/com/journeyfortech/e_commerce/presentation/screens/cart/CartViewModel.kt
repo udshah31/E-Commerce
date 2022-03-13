@@ -1,9 +1,6 @@
 package com.journeyfortech.e_commerce.presentation.screens.cart
 
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.journeyfortech.e_commerce.common.Resource
@@ -24,11 +21,15 @@ class CartViewModel @Inject constructor(
     private val _state = MutableStateFlow<Resource<List<Cart>>>(Resource.Loading())
     val state = _state.asStateFlow()
 
-    var subTotal: String? by mutableStateOf("0.0")
+    private val _subTotal = MutableStateFlow<Double>(0.0)
+    val subTotal = _subTotal.asStateFlow()
 
+    private val _total = MutableStateFlow<Double>(0.0)
+    val total = _total.asStateFlow()
 
-    var total: Double = 0.0
-    var quantity = 1
+    private val _quantity = MutableStateFlow<Int>(1)
+    val quantity = _quantity.asStateFlow()
+
     var delivery = 50
 
     private fun cartItems() = viewModelScope.launch {
@@ -47,8 +48,8 @@ class CartViewModel @Inject constructor(
         total()
     }
 
-    //cart
 
+    //cart
     fun quantityAdded() = viewModelScope.launch {
         repository.getAllCart()
             .onStart {
@@ -57,15 +58,15 @@ class CartViewModel @Inject constructor(
                 _state.value = Resource.Error(e.toString())
             }.collect { response ->
                 _state.value = Resource.Success(response)
-                quantity++
+                _quantity.value++
                 _state.value.data!!.forEach { cart ->
-                    subTotal = quantity.times(cart.price!!).toString()
+                    _subTotal.value = _quantity.value.times(cart.price!!)
                 }
             }
     }
 
     fun quantityRemoved() = viewModelScope.launch {
-        if (quantity == 1) {
+        if (_quantity.value == 1) {
             repository.getAllCart()
                 .onStart {
                     _state.value = Resource.Loading()
@@ -74,11 +75,12 @@ class CartViewModel @Inject constructor(
                 }.collect { response ->
                     _state.value = Resource.Success(response)
                     _state.value.data!!.forEach { cart ->
-                        subTotal = quantity.times(cart.price!!).toString()
+                        _subTotal.value = _quantity.value.times(cart.price!!)
+
                     }
                 }
         } else {
-            quantity -= 1
+            _quantity.value -= 1
             repository.getAllCart()
                 .onStart {
                     _state.value = Resource.Loading()
@@ -87,7 +89,7 @@ class CartViewModel @Inject constructor(
                 }.collect { response ->
                     _state.value = Resource.Success(response)
                     _state.value.data!!.forEach { cart ->
-                        subTotal = quantity.times(cart.price!!).toString()
+                        _subTotal.value = _quantity.value.times(cart.price!!)
                     }
                 }
         }
@@ -101,8 +103,8 @@ class CartViewModel @Inject constructor(
             .catch { e -> _state.value = Resource.Error(e.toString()) }
             .collect { response ->
                 _state.value = Resource.Success(response)
-                total =
-                    _state.value.data!!.map { it.price!!.times(it.quantity!!) }.plus(delivery)
+                _total.value =
+                    _state.value.data!!.map { it.price!!.times(_quantity.value) }.plus(delivery)
                         .sumOf { it.toDouble() }
             }
     }
@@ -125,4 +127,10 @@ class CartViewModel @Inject constructor(
     fun deleteCart(cart: Cart) = viewModelScope.launch {
         repository.deleteCart(cart)
     }
+
+    fun updateCartItem(cart: Cart) = viewModelScope.launch {
+        repository.updateCart(cart)
+    }
+
+
 }

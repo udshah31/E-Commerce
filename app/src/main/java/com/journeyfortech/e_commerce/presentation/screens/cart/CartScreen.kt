@@ -26,6 +26,7 @@ import com.journeyfortech.e_commerce.R
 import com.journeyfortech.e_commerce.common.CartItem
 import com.journeyfortech.e_commerce.common.Resource
 
+
 @ExperimentalMaterialApi
 @Composable
 fun CartScreen(
@@ -34,6 +35,7 @@ fun CartScreen(
 ) {
     val scrollState = rememberLazyListState()
     val result = viewModel.state.collectAsState().value
+    val quality = viewModel.quantity.collectAsState().value
 
     when (result) {
         is Resource.Success -> {
@@ -81,7 +83,7 @@ fun CartScreen(
                         itemsIndexed(
                             items = result.data!!,
                             key = { _, item ->
-                                item.hashCode()
+                                item.id!!.toInt()
                             }
                         ) { _, item ->
                             val state = rememberDismissState(
@@ -118,15 +120,18 @@ fun CartScreen(
                                 dismissContent = {
                                     CartItem(
                                         item = item,
-                                        quantity = viewModel.quantity.toString() ,
+                                        quantity = quality.toString(),
                                         onClickAdd = {
                                             viewModel.quantityAdded()
+                                            viewModel.updateCartItem(item)
                                         },
                                         onClickRemove = {
                                             viewModel.quantityRemoved()
+                                            viewModel.updateCartItem(item)
                                         }
                                     )
-                                }, directions = setOf(DismissDirection.EndToStart)
+                                },
+                                directions = setOf(DismissDirection.EndToStart),
                             )
                         }
                     }
@@ -152,6 +157,8 @@ fun CartScreen(
 fun TotalAmount(
     viewModel: CartViewModel = hiltViewModel()
 ) {
+    val subTotal = viewModel.subTotal.collectAsState().value
+    val total = viewModel.total.collectAsState().value
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -177,7 +184,7 @@ fun TotalAmount(
                 )
 
                 Text(
-                    text = "Rs.${viewModel.subTotal}",
+                    text = "Rs.${subTotal}",
                     style = MaterialTheme.typography.subtitle2,
                     color = Color.LightGray,
                     fontWeight = FontWeight.Bold
@@ -217,7 +224,7 @@ fun TotalAmount(
                 )
 
                 Text(
-                    text = "Rs.${viewModel.total}",
+                    text = "Rs.${total}",
                     style = MaterialTheme.typography.body1,
                     fontWeight = FontWeight.ExtraBold
                 )

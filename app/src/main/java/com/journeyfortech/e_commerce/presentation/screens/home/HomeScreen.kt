@@ -24,6 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.accompanist.flowlayout.FlowMainAxisAlignment
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.SizeMode
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
@@ -31,7 +34,6 @@ import com.google.accompanist.pager.rememberPagerState
 import com.journeyfortech.e_commerce.common.*
 import com.journeyfortech.e_commerce.data.model.category
 import com.journeyfortech.e_commerce.data.model.offers
-import com.journeyfortech.e_commerce.data.model.product.ProductResponseItem
 import com.journeyfortech.e_commerce.data.model.slider
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -70,27 +72,31 @@ fun HomeScreen(
                 JustForYou()
 
             }
-            when (justForYou) {
-                is Resource.Success -> {
-                    val itemCount = if (justForYou.data!!.size % 2 == 0) {
-                        justForYou.data!!.size / 2
-                    } else {
-                        justForYou.data!!.size / 2 + 1
+
+            item {
+                when (justForYou) {
+                    is Resource.Success -> {
+                        FlowRow(
+                            mainAxisSize = SizeMode.Expand,
+                            mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween
+                        ) {
+                            justForYou.data!!.mapIndexed { _, item ->
+                                JustForYouItem(
+                                    item = item
+                                )
+                            }
+                        }
+
                     }
-                    items(itemCount) { item ->
-                        JustForRow(rowIndex = item, list = justForYou.data!!)
+                    is Resource.Error -> {
+
                     }
-                }
-                is Resource.Error -> {
 
-                }
+                    is Resource.Loading -> {
 
-                is Resource.Loading -> {
-
+                    }
                 }
             }
-
-
         }
     }
 
@@ -314,7 +320,7 @@ fun JustForYou() {
 
 }
 
-@Composable
+/*@Composable
 fun JustForRow(
     rowIndex: Int,
     list: List<ProductResponseItem>
@@ -339,5 +345,5 @@ fun JustForRow(
             }
         }
     }
-}
+}*/
 

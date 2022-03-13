@@ -32,7 +32,7 @@ class ECommerceRepository @Inject constructor(
     suspend fun insertCart(cart: Cart) = appDatabase.cartDao().insertCart(cart)
 
     fun getAllCart(): Flow<List<Cart>> =
-        appDatabase.cartDao().getAllCart().flowOn(Dispatchers.IO).conflate()
+        appDatabase.cartDao().getAllCart()
 
     suspend fun updateCart(cart: Cart) = appDatabase.cartDao().updateCart(cart)
 
@@ -41,6 +41,7 @@ class ECommerceRepository @Inject constructor(
     suspend fun deleteCart(cart: Cart) = appDatabase.cartDao().deleteCart(cart)
 
     fun isCart(id: Long): Flow<Cart?> = appDatabase.cartDao().getCart(id)
+
 
     //database
     suspend fun insertFav(favourite: Favourite) = appDatabase.favDao().insertFav(favourite)

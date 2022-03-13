@@ -11,10 +11,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -27,11 +29,14 @@ import com.journeyfortech.e_commerce.data.model.product.ProductResponseItem
 @Composable
 fun JustForYouItem(
     item: ProductResponseItem,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
+    val itemWidth: Dp = LocalConfiguration.current.screenWidthDp.dp / 2
+    val itemHeight: Dp = LocalConfiguration.current.screenHeightDp.dp / 2
     Card(
         modifier
-            .wrapContentSize()
+            .width(itemWidth)
+            .height(itemHeight)
             .padding(8.dp),
         shape = RectangleShape,
         elevation = 5.dp
@@ -220,5 +225,4 @@ fun JustForYouImage(
     }
 
 }
-
 
